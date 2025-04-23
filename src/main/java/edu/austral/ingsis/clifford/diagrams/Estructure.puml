@@ -1,0 +1,71 @@
+@startuml
+  class FileSystem {
+    - Directory root
+    - Directory currentDirectory
+    + FileSystem()
+    + Directory getCurrentDirectory()
+  }
+    interface FileSystemObject {
+      + String getName()
+      + Directory getFather()
+      * String getPath()
+    }
+
+    class File {
+      - String name
+      - Directory father
+      + File(String, Directory)
+      + String getName()
+      + Directory getFather()
+    }
+
+    class Directory {
+      - String name
+      - Directory father
+      - List<FileSystemObject> children
+      + Directory(String, Directory, List<Element>)
+      + String getName()
+      + Directory getFather()
+      + List<FileSystemObject> getChildren()
+    }
+
+    FileSystemObject <|.. File
+    FileSystemObject <|.. Directory
+
+  interface Command {
+    + Result execute(String argument)
+  }
+  class Ls implements Command {
+    + Result execute(String argument)
+  }
+
+  class Cd implements Command {
+    + Result execute(String argument)
+  }
+
+  class Pwd implements Command {
+    + Result execute(String argument)
+  }
+
+  class Mkdir implements Command {
+    + Result execute(String argument)
+  }
+
+  class Touch implements Command {
+    + Result execute(String argument)
+  }
+
+  class Rm implements Command {
+    + Result execute(String argument)
+  }
+  interface Result{
+    + String getMessage()
+  }
+  class Error implements Result {
+        + String getMessage()
+      }
+  class Success implements Result {
+        + String getMessage()
+      }
+  FileSystem --> Command
+@enduml

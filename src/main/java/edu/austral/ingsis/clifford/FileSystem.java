@@ -1,3 +1,44 @@
 package edu.austral.ingsis.clifford;
 
-public interface FileSystem {}
+import java.util.List;
+
+public class FileSystem {
+    private Directory root;
+    private Directory currentDirectory;
+
+    public FileSystem() {
+        this.root = new Directory("/", null, List.of());
+        this.currentDirectory = root;
+    }
+
+    public Directory getRoot() {
+        return root;
+    }
+
+    public Directory getCurrentDirectory() {
+        return currentDirectory;
+    }
+
+    public void setCurrentDirectory(Directory currentDirectory) {
+        this.currentDirectory = currentDirectory;
+    }
+
+    public Result list(String parameter) {
+        return null;
+    }
+    public void makeDir(String parameter) {
+
+    }
+    public void changeDir(String parameter) {
+
+    }
+    public void touch(String parameter) {
+
+    }
+    public void remove(String parameter) {
+
+    }
+    public void pathWd(String parameter) {
+
+    }
+}
