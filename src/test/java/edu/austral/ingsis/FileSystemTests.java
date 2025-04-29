@@ -3,9 +3,6 @@ package edu.austral.ingsis;
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.List;
-import java.util.Map;
-
 import edu.austral.ingsis.clifford.CommandParser;
 import edu.austral.ingsis.clifford.CommandRegistry;
 import edu.austral.ingsis.clifford.FileSystem;
@@ -16,6 +13,8 @@ import edu.austral.ingsis.clifford.factories.MkdirFactory;
 import edu.austral.ingsis.clifford.factories.PwdFactory;
 import edu.austral.ingsis.clifford.factories.RmFactory;
 import edu.austral.ingsis.clifford.factories.TouchFactory;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 public class FileSystemTests {
@@ -37,7 +36,7 @@ public class FileSystemTests {
   private void executeTest(List<Map.Entry<String, String>> commandsAndResults) {
     final List<String> commands = commandsAndResults.stream().map(Map.Entry::getKey).toList();
     final List<String> expectedResult =
-            commandsAndResults.stream().map(Map.Entry::getValue).toList();
+        commandsAndResults.stream().map(Map.Entry::getValue).toList();
 
     final List<String> actualResult = runner.executeCommands(commands);
 
