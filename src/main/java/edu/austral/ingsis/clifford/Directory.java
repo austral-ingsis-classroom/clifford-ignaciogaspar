@@ -1,5 +1,6 @@
 package edu.austral.ingsis.clifford;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Directory implements FileSystemObjects {
@@ -10,7 +11,11 @@ public class Directory implements FileSystemObjects {
 
     public Directory(String name, Directory father, List<FileSystemObjects> children) {
         this.name = name;
-        this.path = (father != null ? father.getPath() : "") + "/" + name;
+        if (father == null) {
+            this.path = "/"; // La raíz siempre es "/"
+        } else {
+            this.path = father.getPath().equals("/") ? father.getPath() + name : father.getPath() + "/" + name;
+        }
         this.children = children;
     }
 

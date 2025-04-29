@@ -1,5 +1,6 @@
 package edu.austral.ingsis.clifford;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FileSystem {
@@ -7,7 +8,7 @@ public class FileSystem {
     private Directory currentDirectory;
 
     public FileSystem() {
-        this.root = new Directory("/", null, List.of());
+        this.root = new Directory("/", null, new ArrayList<>());
         this.currentDirectory = root;
     }
 

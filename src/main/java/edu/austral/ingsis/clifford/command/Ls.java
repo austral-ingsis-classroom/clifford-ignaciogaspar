@@ -5,8 +5,10 @@ import edu.austral.ingsis.clifford.FileSystem;
 import edu.austral.ingsis.clifford.FileSystemObjects;
 import edu.austral.ingsis.clifford.Result;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Ls implements Command {
     private final String order;
@@ -24,7 +26,7 @@ public class Ls implements Command {
             return new Result.Success<>(""); // Directorio vacío
         }
 
-        List<String> names = children.stream().map(FileSystemObjects::getName).toList();
+        List<String> names = new ArrayList<>(children.stream().map(FileSystemObjects::getName).collect(Collectors.toList()));
 
         if (order != null) {
             if (order.equalsIgnoreCase("asc")) {

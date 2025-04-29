@@ -5,16 +5,39 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.Map;
+
+import edu.austral.ingsis.clifford.CommandParser;
+import edu.austral.ingsis.clifford.CommandRegistry;
+import edu.austral.ingsis.clifford.FileSystem;
+import edu.austral.ingsis.clifford.FileSystemRunner;
+import edu.austral.ingsis.clifford.factories.CdFactory;
+import edu.austral.ingsis.clifford.factories.LsFactory;
+import edu.austral.ingsis.clifford.factories.MkdirFactory;
+import edu.austral.ingsis.clifford.factories.PwdFactory;
+import edu.austral.ingsis.clifford.factories.RmFactory;
+import edu.austral.ingsis.clifford.factories.TouchFactory;
 import org.junit.jupiter.api.Test;
 
 public class FileSystemTests {
 
-  private final FileSystemRunner runner = commands -> List.of();
+  private final CommandRegistry registry = new CommandRegistry();
+  private final CommandParser parser = new CommandParser(registry);
+  private final FileSystem fileSystem = new FileSystem();
+  private final FileSystemRunner runner = new FileSystemRunner(parser, fileSystem);
+
+  public FileSystemTests() {
+    registry.register("ls", new LsFactory());
+    registry.register("cd", new CdFactory());
+    registry.register("touch", new TouchFactory());
+    registry.register("mkdir", new MkdirFactory());
+    registry.register("rm", new RmFactory());
+    registry.register("pwd", new PwdFactory());
+  }
 
   private void executeTest(List<Map.Entry<String, String>> commandsAndResults) {
     final List<String> commands = commandsAndResults.stream().map(Map.Entry::getKey).toList();
     final List<String> expectedResult =
-        commandsAndResults.stream().map(Map.Entry::getValue).toList();
+            commandsAndResults.stream().map(Map.Entry::getValue).toList();
 
     final List<String> actualResult = runner.executeCommands(commands);
 
@@ -58,7 +81,7 @@ public class FileSystemTests {
             entry("cd emily", "moved to directory 'emily'"),
             entry("touch elizabeth.txt", "'elizabeth.txt' file created"),
             entry("mkdir t-bone", "'t-bone' directory created"),
-            entry("ls", "t-bone elizabeth.txt"),
+            entry("ls", "elizabeth.txt t-bone"),
             entry("rm t-bone", "cannot remove 't-bone', is a directory"),
             entry("rm --recursive t-bone", "'t-bone' removed"),
             entry("ls", "elizabeth.txt"),

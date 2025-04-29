@@ -23,13 +23,13 @@ public class Rm implements Command {
         Directory currentDirectory = fileSystem.getCurrentDirectory();
         FileSystemObjects target = findFileSystemObject(currentDirectory, path);
         if (target == null) {
-            return new Result.Error("File or directory not found: " + path);
+            return new Result.Error("file or directory not found: " + path);
         }
         if (target.isDirectory() && !recursive) {
-            return new Result.Error("Cannot remove directory '" + path + "' without --recursive flag");
+            return new Result.Error("cannot remove '" + path + "', is a directory");
         }
         removeFileSystemObject(currentDirectory, target);
-        return new Result.Success("'" + path + "' removed");
+        return new Result.Success<>("'" + path + "' removed");
     }
 
     private FileSystemObjects findFileSystemObject(Directory directory, String path) {

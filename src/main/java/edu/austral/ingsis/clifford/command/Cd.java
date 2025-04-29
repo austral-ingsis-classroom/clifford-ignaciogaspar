@@ -19,7 +19,7 @@ public class Cd implements Command {
         if (resolutionResult instanceof Result.Success) {
             Directory targetDirectory = ((Result.Success<Directory>) resolutionResult).getValue();
             fileSystem.setCurrentDirectory(targetDirectory);
-            return new Result.Success<>("Moved to directory: '" + targetDirectory.getName() + "'");
+            return new Result.Success<>("moved to directory '" + targetDirectory.getName() + "'");
         } else {
             return new Result.Error(((Result.Error) resolutionResult).getMessage());
         }

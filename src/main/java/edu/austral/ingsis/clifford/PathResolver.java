@@ -39,38 +39,40 @@ public class PathResolver {
     }
 
     private static Result resolveAbsolutePath(Directory root, String path) {
-        Directory target = findDirectory(root, path);
-        if (target != null) {
-            return new Result.Success<>(target);
+        Result result = findDirectory(root, path, true);
+        if (result instanceof Result.Success) {
+            return result;
         } else {
-            return new Result.Error("Directory not found: " + path);
+            return new Result.Error("'" + path + "' directory does not exist");
         }
     }
 
     private static Result resolveRelativePath(Directory currentDirectory, String path) {
-        Directory target = findDirectory(currentDirectory, currentDirectory.getPath() + "/" + path);
-        if (target != null) {
-            return new Result.Success<>(target);
+        Result result = findDirectory(currentDirectory, path, false); // Pass false to indicate relative path
+        if (result instanceof Result.Success) {
+            return result;
         } else {
-            return new Result.Error("Directory not found: " + path);
+            return new Result.Error("'" + path + "' directory does not exist");
         }
     }
 
-    private static Directory findDirectory(Directory start, String path) {
-        if (start.getPath().equals(path)) {
-            return start;
+    private static Result findDirectory(Directory start, String path, boolean isAbsolutePath) {
+        String targetPath = isAbsolutePath ? path : start.getPath().equals("/") ? "/" + path : start.getPath() + "/" + path;
+
+        if (start.getPath().equals(targetPath)) {
+            return new Result.Success<>(start);
         }
 
-        if (path.startsWith(start.getPath())) {
+        if (targetPath.startsWith(start.getPath())) {
             for (FileSystemObjects child : start.getChildren()) {
                 if (child.isDirectory()) {
-                    Directory found = findDirectory((Directory) child, path);
-                    if (found != null) {
+                    Result found = findDirectory((Directory) child, targetPath, true); // Always use absolute path for recursion
+                    if (found instanceof Result.Success) {
                         return found;
                     }
                 }
             }
         }
-        return null;
+        return new Result.Error("'" + path + "' directory does not exist");
     }
 }
