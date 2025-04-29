@@ -22,23 +22,4 @@ public class FileSystem {
     public void setCurrentDirectory(Directory currentDirectory) {
         this.currentDirectory = currentDirectory;
     }
-
-    public Result list(String parameter) {
-        return null;
-    }
-    public void makeDir(String parameter) {
-
-    }
-    public void changeDir(String parameter) {
-
-    }
-    public void touch(String parameter) {
-
-    }
-    public void remove(String parameter) {
-
-    }
-    public void pathWd(String parameter) {
-
-    }
 }

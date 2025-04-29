@@ -3,11 +3,9 @@ package edu.austral.ingsis.clifford;
 public class File implements FileSystemObjects{
     private String name;
     private String path;
-    private Directory father;
 
     public File(String name, Directory father) {
         this.name = name;
-        this.father = father;
         this.path = father.getPath() + "/" + name;
     }
 
@@ -26,8 +24,4 @@ public class File implements FileSystemObjects{
         return false;
     }
 
-    @Override
-    public Directory getFather() {
-        return father;
-    }
 }
