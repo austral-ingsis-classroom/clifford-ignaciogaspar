@@ -1,28 +1,28 @@
 package edu.austral.ingsis.clifford.command;
 
 import edu.austral.ingsis.clifford.Directory;
+import edu.austral.ingsis.clifford.File;
 import edu.austral.ingsis.clifford.FileSystem;
 import edu.austral.ingsis.clifford.PathResolver;
 import edu.austral.ingsis.clifford.Result;
 
 public class Cd implements Command {
-  private String path;
+  private final String path;
 
   public Cd(String path) {
     this.path = path;
   }
 
   @Override
-  public Result execute(FileSystem fileSystem) {
-    Result resolutionResult =
-        PathResolver.resolvePath(fileSystem.getCurrentDirectory(), fileSystem.getRoot(), path);
+  public Result<FileSystem> execute(FileSystem fileSystem) {
+    Result<Directory> resolutionResult = PathResolver.resolvePath(fileSystem.getCurrentDirectory(), fileSystem.getRoot(), path);
 
-    if (resolutionResult instanceof Result.Success) {
-      Directory targetDirectory = ((Result.Success<Directory>) resolutionResult).getValue();
-      fileSystem.setCurrentDirectory(targetDirectory);
-      return new Result.Success<>("moved to directory '" + targetDirectory.getName() + "'");
-    } else {
-      return new Result.Error(((Result.Error) resolutionResult).getMessage());
-    }
+    return switch (resolutionResult) {
+      case Result.Success<Directory> success -> {
+        Directory targetDirectory = success.getValue();
+        yield new Result.Success<>(fileSystem.withCurrentDirectory(targetDirectory),"moved to directory '" + targetDirectory.getName() + "'");
+      }
+      case Result.Error<Directory> error -> new Result.Error<>(error.getMessage());
+    };
   }
 }

@@ -17,17 +17,22 @@ public class FileSystemRunner {
   public List<String> executeCommands(List<String> commands) {
     List<String> results = new ArrayList<>();
     for (String command : commands) {
-      Result result = parser.parse(command);
-      if (result instanceof Result.Success) {
-        Command cmd = (Command) ((Result.Success<?>) result).getValue();
-        Result executionResult = cmd.execute(fileSystem);
-        if (executionResult instanceof Result.Success) {
-          results.add(((Result.Success<?>) executionResult).getValue().toString());
-        } else if (executionResult instanceof Result.Error) {
-          results.add(((Result.Error) executionResult).getMessage());
+      Result<Command> result = parser.parse(command);
+
+      switch (result) {
+        case Result.Success<Command> success -> {
+          Command cmd = success.getValue();
+          Result<?> executionResult = cmd.execute(fileSystem);
+
+          switch (executionResult) {
+            case Result.Success<?> execSuccess ->
+                    results.add(execSuccess.getMessage());
+            case Result.Error<?> execError ->
+                    results.add(execError.getMessage());
+          }
         }
-      } else if (result instanceof Result.Error) {
-        results.add(((Result.Error) result).getMessage());
+        case Result.Error<?> error ->
+                results.add(error.getMessage());
       }
     }
     return results;

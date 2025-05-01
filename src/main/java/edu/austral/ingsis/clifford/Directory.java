@@ -1,22 +1,19 @@
 package edu.austral.ingsis.clifford;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Directory implements FileSystemObjects {
 
-  private String path;
-  private String name;
-  private List<FileSystemObjects> children;
+  private final String path;
+  private final String name;
+  private final List<FileSystemObjects> children;
 
-  public Directory(String name, Directory father, List<FileSystemObjects> children) {
+  public Directory(String name, String path, List<FileSystemObjects> children) {
     this.name = name;
-    if (father == null) {
-      this.path = "/"; // La raíz siempre es "/"
-    } else {
-      this.path =
-          father.getPath().equals("/") ? father.getPath() + name : father.getPath() + "/" + name;
-    }
-    this.children = children;
+    this.path = path;
+    this.children = new ArrayList<>(children); // Defensive copy
   }
 
   @Override
@@ -36,5 +33,22 @@ public class Directory implements FileSystemObjects {
 
   public List<FileSystemObjects> getChildren() {
     return children;
+  }
+
+  public Directory withChild(FileSystemObjects newChild) {
+    List<FileSystemObjects> newChildren = new ArrayList<>(this.children);
+    newChildren.add(newChild);
+    return new Directory(this.name, this.path, newChildren);
+  }
+
+  public Directory withName(String newName) {
+    String newPath = this.path.substring(0, this.path.lastIndexOf('/')) + "/" + newName;
+    return new Directory(newName, newPath, this.children);
+  }
+
+  public Directory withoutChild(FileSystemObjects childToRemove) {
+    List<FileSystemObjects> newChildren = new ArrayList<>(this.children);
+    newChildren.remove(childToRemove);
+    return new Directory(this.name, this.path, newChildren);
   }
 }

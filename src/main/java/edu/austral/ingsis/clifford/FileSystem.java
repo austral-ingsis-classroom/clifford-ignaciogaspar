@@ -3,12 +3,16 @@ package edu.austral.ingsis.clifford;
 import java.util.ArrayList;
 
 public class FileSystem {
-  private Directory root;
-  private Directory currentDirectory;
+  private final Directory root;
+  private final Directory currentDirectory;
 
   public FileSystem() {
-    this.root = new Directory("/", null, new ArrayList<>());
-    this.currentDirectory = root;
+    this(new Directory("/", "/", new ArrayList<>()), new Directory("/", "/", new ArrayList<>()));
+  }
+
+  public FileSystem(Directory root, Directory currentDirectory) {
+    this.root = root;
+    this.currentDirectory = currentDirectory;
   }
 
   public Directory getRoot() {
@@ -19,7 +23,7 @@ public class FileSystem {
     return currentDirectory;
   }
 
-  public void setCurrentDirectory(Directory currentDirectory) {
-    this.currentDirectory = currentDirectory;
+  public FileSystem withCurrentDirectory(Directory currentDirectory) {
+    return new FileSystem(this.root, currentDirectory);
   }
 }

@@ -1,12 +1,13 @@
 package edu.austral.ingsis.clifford.factories;
 
 import edu.austral.ingsis.clifford.Result;
+import edu.austral.ingsis.clifford.command.Command;
 import edu.austral.ingsis.clifford.command.Ls;
 
 public class LsFactory implements CommandFactory {
 
   @Override
-  public Result create(String input) {
+  public Result<Command> create(String input) {
     String order = null;
     if (input.contains("--ord=")) {
       int startIndex = input.indexOf("--ord=") + 6;

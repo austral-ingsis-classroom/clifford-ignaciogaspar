@@ -17,28 +17,26 @@ public class Ls implements Command {
   }
 
   @Override
-  public Result execute(FileSystem fileSystem) {
+  public Result<String> execute(FileSystem fileSystem) {
     Directory currentDirectory = fileSystem.getCurrentDirectory();
     List<FileSystemObjects> children = currentDirectory.getChildren();
 
     if (children.isEmpty()) {
-      return new Result.Success<>(""); // Directorio vacío
+      return new Result.Success<>("","");
     }
-
     List<String> names =
-        new ArrayList<>(
-            children.stream().map(FileSystemObjects::getName).collect(Collectors.toList()));
+            children.stream().map(FileSystemObjects::getName).collect(Collectors.toList());
 
     if (order != null) {
       if (order.equalsIgnoreCase("asc")) {
         Collections.sort(names);
       } else if (order.equalsIgnoreCase("desc")) {
-        Collections.sort(names, Collections.reverseOrder());
+        names.sort(Collections.reverseOrder());
       } else {
-        return new Result.Error("Invalid order parameter: " + order);
+        return new Result.Error<>("invalid order parameter: " + order);
       }
     }
 
-    return new Result.Success<>(String.join(" ", names));
+    return new Result.Success<>(String.join(" ", names), String.join(" ", names));
   }
 }

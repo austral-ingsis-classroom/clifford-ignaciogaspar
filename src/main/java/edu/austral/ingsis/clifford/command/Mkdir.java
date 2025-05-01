@@ -6,21 +6,20 @@ import edu.austral.ingsis.clifford.Result;
 import java.util.ArrayList;
 
 public class Mkdir implements Command {
-  private String directoryName;
+  private final String directoryName;
 
   public Mkdir(String directoryName) {
     this.directoryName = directoryName;
   }
 
   @Override
-  public Result execute(FileSystem fileSystem) {
+  public Result<FileSystem> execute(FileSystem fileSystem) {
     if (directoryName.contains("/") || directoryName.contains(" ")) {
-      return new Result.Error("Invalid directory name: " + directoryName);
+      return new Result.Error<>("invalid directory name: " + directoryName);
     }
-
-    Directory newDirectory =
-        new Directory(directoryName, fileSystem.getCurrentDirectory(), new ArrayList<>());
-    fileSystem.getCurrentDirectory().getChildren().add(newDirectory);
-    return new Result.Success<>("'" + directoryName + "' directory created");
+    Directory newDirectory = new Directory(directoryName, fileSystem.getCurrentDirectory().getPath().equals("/") ?
+            "/" + directoryName : fileSystem.getCurrentDirectory().getPath() + "/" + directoryName, new ArrayList<>());
+    Directory updatedCurrentDirectory = fileSystem.getCurrentDirectory().withChild(newDirectory);
+    return new Result.Success<>(new FileSystem(fileSystem.getRoot(), updatedCurrentDirectory), "'" + directoryName + "' directory created");
   }
 }

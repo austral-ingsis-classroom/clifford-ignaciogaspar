@@ -1,12 +1,13 @@
 package edu.austral.ingsis.clifford.factories;
 
 import edu.austral.ingsis.clifford.Result;
+import edu.austral.ingsis.clifford.command.Command;
 import edu.austral.ingsis.clifford.command.Rm;
 
 public class RmFactory implements CommandFactory {
 
   @Override
-  public Result create(String input) {
+  public Result<Command> create(String input) {
     String fileName = input.trim();
     boolean recursive = false;
 

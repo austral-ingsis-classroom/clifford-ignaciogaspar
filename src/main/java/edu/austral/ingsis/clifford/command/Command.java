@@ -4,5 +4,5 @@ import edu.austral.ingsis.clifford.FileSystem;
 import edu.austral.ingsis.clifford.Result;
 
 public interface Command {
-  public Result execute(FileSystem fileSystem);
+  Result execute(FileSystem fileSystem);
 }

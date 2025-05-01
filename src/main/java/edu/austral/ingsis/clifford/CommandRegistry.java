@@ -5,20 +5,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CommandRegistry {
-  private final Map<String, CommandFactory> factories = new HashMap<>();
+    private final Map<String, CommandFactory> factories = new HashMap<>();
 
-  public void register(String name, CommandFactory factory) {
-    factories.put(name, factory);
-  }
-
-  public Result getFactory(String name) {
-    if (!factories.containsKey(name)) {
-      return new Result.Error("Command not found: " + name);
+    public void register(String name, CommandFactory factory) {
+        factories.put(name, factory);
     }
-    return new Result.Success<>(factories.get(name));
-  }
 
-  public boolean hasCommand(String name) {
-    return factories.containsKey(name);
-  }
+    public Result<CommandFactory> getFactory(String name) {
+        if (!factories.containsKey(name)) {
+            return new Result.Error<>("command not found: " + name);
+        }
+        return new Result.Success<>(factories.get(name));
+    }
+    public Result<String> addNewCommand(String name, CommandFactory factory) {
+        if (factories.containsKey(name)) {
+            return new Result.Error<>("command already exists: " + name);
+        }
+        factories.put(name, factory);
+        return new Result.Success<>("command added successfully");
+    }
 }
