@@ -6,9 +6,11 @@ public sealed interface Result<T> permits Result.Error, Result.Success {
       this.value = value;
       this.message = message;
     }
+
     public T getValue() {
       return value;
     }
+
     public String getMessage() {
       return message;
     }
