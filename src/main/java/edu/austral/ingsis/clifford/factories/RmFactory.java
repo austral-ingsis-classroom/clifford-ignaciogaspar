@@ -16,6 +16,6 @@ public class RmFactory implements CommandFactory {
       recursive = true;
     }
 
-    return new Result.Success<>(new Rm(fileName, recursive));
+    return new Result.Success<>(new Rm(fileName, recursive), "");
   }
 }

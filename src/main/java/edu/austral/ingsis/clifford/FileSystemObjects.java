@@ -2,9 +2,9 @@ package edu.austral.ingsis.clifford;
 
 public interface FileSystemObjects {
 
-  public String getPath();
+  public String path();
 
-  public String getName();
+  public String name();
 
   public boolean isDirectory();
 }

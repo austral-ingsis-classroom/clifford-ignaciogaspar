@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.austral.ingsis.clifford.CommandParser;
 import edu.austral.ingsis.clifford.CommandRegistry;
-import edu.austral.ingsis.clifford.FileSystem;
 import edu.austral.ingsis.clifford.FileSystemRunner;
 import edu.austral.ingsis.clifford.factories.CdFactory;
 import edu.austral.ingsis.clifford.factories.LsFactory;
@@ -18,20 +17,23 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 public class FileSystemTests {
-
-  private final CommandRegistry registry = new CommandRegistry();
+  private final CommandRegistry registry =
+      new CommandRegistry(
+          Map.of(
+              "ls",
+              new LsFactory(),
+              "cd",
+              new CdFactory(),
+              "pwd",
+              new PwdFactory(),
+              "rm",
+              new RmFactory(),
+              "touch",
+              new TouchFactory(),
+              "mkdir",
+              new MkdirFactory()));
   private final CommandParser parser = new CommandParser(registry);
-  private final FileSystem fileSystem = new FileSystem();
-  private final FileSystemRunner runner = new FileSystemRunner(parser, fileSystem);
-
-  public FileSystemTests() {
-    registry.register("ls", new LsFactory());
-    registry.register("cd", new CdFactory());
-    registry.register("touch", new TouchFactory());
-    registry.register("mkdir", new MkdirFactory());
-    registry.register("rm", new RmFactory());
-    registry.register("pwd", new PwdFactory());
-  }
+  private final FileSystemRunner runner = new FileSystemRunner(parser);
 
   private void executeTest(List<Map.Entry<String, String>> commandsAndResults) {
     final List<String> commands = commandsAndResults.stream().map(Map.Entry::getKey).toList();
@@ -141,5 +143,166 @@ public class FileSystemTests {
             entry("rm --recursive emily", "'emily' removed"),
             entry("ls", "emily.txt jetta.txt"),
             entry("ls --ord=desc", "jetta.txt emily.txt")));
+  }
+
+  @Test
+  void test9_nestedDirectories() {
+    executeTest(
+        List.of(
+            entry("mkdir -p a/b/c", "invalid directory name: -p a/b/c"),
+            entry("mkdir a", "'a' directory created"),
+            entry("cd a", "moved to directory 'a'"),
+            entry("mkdir b", "'b' directory created"),
+            entry("cd b", "moved to directory 'b'"),
+            entry("mkdir c", "'c' directory created"),
+            entry("ls", "c"),
+            entry("pwd", "/a/b"),
+            entry("cd ..", "moved to directory 'a'"),
+            entry("ls", "b")));
+  }
+
+  @Test
+  void test10_touchMultipleFiles() {
+    executeTest(
+        List.of(
+            entry("touch file1.txt", "'file1.txt' file created"),
+            entry("touch file2.txt", "'file2.txt' file created"),
+            entry("ls", "file1.txt file2.txt"),
+            entry("ls --ord=desc", "file2.txt file1.txt")));
+  }
+
+  @Test
+  void test11_removeNonExisting() {
+    executeTest(
+        List.of(
+            entry("rm non_existent.txt", "file or directory not found: non_existent.txt"),
+            entry(
+                "rm --recursive non_existent_dir",
+                "file or directory not found: non_existent_dir")));
+  }
+
+  @Test
+  void test12_createFileInSubdirectory() {
+    executeTest(
+        List.of(
+            entry("mkdir alpha", "'alpha' directory created"),
+            entry("cd alpha", "moved to directory 'alpha'"),
+            entry("touch beta.txt", "'beta.txt' file created"),
+            entry("ls", "beta.txt"),
+            entry("pwd", "/alpha")));
+  }
+
+  @Test
+  void test13_removeFileFromSubdirectory() {
+    executeTest(
+        List.of(
+            entry("mkdir gamma", "'gamma' directory created"),
+            entry("cd gamma", "moved to directory 'gamma'"),
+            entry("touch delta.txt", "'delta.txt' file created"),
+            entry("ls", "delta.txt"),
+            entry("rm delta.txt", "'delta.txt' removed"),
+            entry("ls", ""),
+            entry("pwd", "/gamma")));
+  }
+
+  @Test
+  void test14_removeEmptyDirectory() {
+    executeTest(
+        List.of(
+            entry("mkdir epsilon", "'epsilon' directory created"),
+            entry("ls", "epsilon"),
+            entry("cd epsilon", "moved to directory 'epsilon'"),
+            entry("touch epsilon.txt", "'epsilon.txt' file created"),
+            entry("cd ..", "moved to directory '/'"),
+            entry("rm epsilon --recursive", "'epsilon' removed"),
+            entry("ls", "")));
+  }
+
+  @Test
+  void test15_cannotRemoveRoot() {
+    executeTest(List.of(entry("rm / --recursive", "rm: invalid name")));
+  }
+
+  @Test
+  void test16_invalidMkdirName() {
+    executeTest(
+        List.of(
+            entry("mkdir invalid name", "invalid directory name: invalid name"),
+            entry("mkdir another/invalid", "invalid directory name: another/invalid")));
+  }
+
+  @Test
+  void test17_invalidTouchName() {
+    executeTest(
+        List.of(
+            entry("touch invalid file", "invalid file name"),
+            entry("touch another/invalid.txt", "invalid file name")));
+  }
+
+  @Test
+  void test18_touchExistingFile() {
+    executeTest(
+        List.of(
+            entry("touch existing.txt", "'existing.txt' file created"),
+            entry("touch existing.txt", "File already exists"),
+            entry("ls", "existing.txt")));
+  }
+
+  @Test
+  void test19_mkdirExistingDirectory() {
+    executeTest(
+        List.of(
+            entry("mkdir existing_dir", "'existing_dir' directory created"),
+            entry("mkdir existing_dir", "invalid directory name: existing_dir"),
+            entry("ls", "existing_dir")));
+  }
+
+  @Test
+  void test20_cdUpFromRoot() {
+    executeTest(List.of(entry("cd ..", "moved to directory '/'")));
+  }
+
+  @Test
+  void test21_cdAbsolutePath() {
+    executeTest(
+        List.of(
+            entry("mkdir a", "'a' directory created"),
+            entry("cd a", "moved to directory 'a'"),
+            entry("mkdir b", "'b' directory created"),
+            entry("cd /a", "moved to directory 'a'"),
+            entry("pwd", "/a")));
+  }
+
+  @Test
+  void test22_rmFileInCurrentDirectory() {
+    executeTest(
+        List.of(
+            entry("touch to_remove.txt", "'to_remove.txt' file created"),
+            entry("ls", "to_remove.txt"),
+            entry("rm to_remove.txt", "'to_remove.txt' removed"),
+            entry("ls", "")));
+  }
+
+  @Test
+  void test23_rmFileInSubdirectoryFromRoot() {
+    executeTest(
+        List.of(
+            entry("mkdir sub", "'sub' directory created"),
+            entry("cd sub", "moved to directory 'sub'"),
+            entry("touch sub_file.txt", "'sub_file.txt' file created"),
+            entry("cd ..", "moved to directory '/'"),
+            entry("rm sub_file.txt", "file or directory not found: sub_file.txt")));
+  }
+
+  @Test
+  void test24_rmDirectoryWithFileInsideRecursive() {
+    executeTest(
+        List.of(
+            entry("mkdir folder_to_delete", "'folder_to_delete' directory created"),
+            entry("cd folder_to_delete", "moved to directory 'folder_to_delete'"),
+            entry("touch inside.txt", "'inside.txt' file created"),
+            entry("cd ..", "moved to directory '/'"),
+            entry("rm --recursive folder_to_delete", "'folder_to_delete' removed"),
+            entry("ls", "")));
   }
 }

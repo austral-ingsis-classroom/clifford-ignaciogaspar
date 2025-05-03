@@ -15,6 +15,6 @@ public class LsFactory implements CommandFactory {
         order = input.substring(startIndex).trim();
       }
     }
-    return new Result.Success<>(new Ls(order));
+    return new Result.Success<>(new Ls(order), "");
   }
 }

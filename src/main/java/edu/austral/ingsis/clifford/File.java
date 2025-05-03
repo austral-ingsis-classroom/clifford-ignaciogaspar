@@ -1,29 +1,17 @@
 package edu.austral.ingsis.clifford;
 
-public class File implements FileSystemObjects {
-  private final String name;
-  private final String path;
-
-  public File(String name, String path) {
-    this.name = name;
-    this.path = path;
-  }
-
-  public File withName(String newName){
-    return new File(newName, this.path.substring(0, this.path.lastIndexOf('/')) + "/" + newName);
-  }
-  @Override
-  public String getPath() {
-    return path;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
+public record File(String name, String path) implements FileSystemObjects {
 
   @Override
   public boolean isDirectory() {
     return false;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    File file = (File) o;
+    return name.equals(file.name) && path.equals(file.path);
   }
 }

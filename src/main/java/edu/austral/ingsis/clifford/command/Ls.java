@@ -4,7 +4,6 @@ import edu.austral.ingsis.clifford.Directory;
 import edu.austral.ingsis.clifford.FileSystem;
 import edu.austral.ingsis.clifford.FileSystemObjects;
 import edu.austral.ingsis.clifford.Result;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,15 +16,15 @@ public class Ls implements Command {
   }
 
   @Override
-  public Result<String> execute(FileSystem fileSystem) {
+  public Result<FileSystem> execute(FileSystem fileSystem) {
     Directory currentDirectory = fileSystem.getCurrentDirectory();
-    List<FileSystemObjects> children = currentDirectory.getChildren();
+    List<FileSystemObjects> children = currentDirectory.children();
 
     if (children.isEmpty()) {
-      return new Result.Success<>("","");
+      return new Result.Success<>(fileSystem, "");
     }
     List<String> names =
-            children.stream().map(FileSystemObjects::getName).collect(Collectors.toList());
+        children.stream().map(FileSystemObjects::name).collect(Collectors.toList());
 
     if (order != null) {
       if (order.equalsIgnoreCase("asc")) {
@@ -37,6 +36,6 @@ public class Ls implements Command {
       }
     }
 
-    return new Result.Success<>(String.join(" ", names), String.join(" ", names));
+    return new Result.Success<>(fileSystem, String.join(" ", names));
   }
 }

@@ -8,6 +8,6 @@ public class CdFactory implements CommandFactory {
 
   @Override
   public Result<Command> create(String input) {
-    return new Result.Success<>(new Cd(input.trim()));
+    return new Result.Success<>(new Cd(input.trim()), "");
   }
 }

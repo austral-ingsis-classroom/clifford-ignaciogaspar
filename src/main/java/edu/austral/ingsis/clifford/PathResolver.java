@@ -3,10 +3,12 @@ package edu.austral.ingsis.clifford;
 public class PathResolver {
 
   public static Result<Directory> resolvePath(
-          Directory currentDirectory, Directory rootDirectory, String path) {
+      Directory currentDirectory, Directory rootDirectory, String path) {
     return switch (path) {
       case "." -> new Result.Success<>(currentDirectory, "Current directory");
-      case ".." -> new Result.Success<>(getParentDirectory(rootDirectory, currentDirectory), "Parent directory");
+      case ".." ->
+          new Result.Success<>(
+              getParentDirectory(rootDirectory, currentDirectory), "Parent directory");
       default -> {
         if (path.startsWith("/")) {
           yield resolveAbsolutePath(rootDirectory, path);
@@ -18,16 +20,16 @@ public class PathResolver {
   }
 
   private static Directory getParentDirectory(Directory root, Directory current) {
-    if (current == root) {
+    if (current.equals(root)) {
       return root;
     }
     return findParent(root, current);
   }
 
   private static Directory findParent(Directory current, Directory target) {
-    for (FileSystemObjects child : current.getChildren()) {
+    for (FileSystemObjects child : current.children()) {
       if (child.isDirectory()) {
-        if (child == target) {
+        if (child.equals(target)) {
           return current;
         }
         Directory found = findParent((Directory) child, target);
@@ -49,8 +51,7 @@ public class PathResolver {
   }
 
   private static Result<Directory> resolveRelativePath(Directory currentDirectory, String path) {
-    Result<Directory> result =
-        findDirectory(currentDirectory, path, false);
+    Result<Directory> result = findDirectory(currentDirectory, path, false);
     if (result instanceof Result.Success) {
       return result;
     } else {
@@ -58,17 +59,19 @@ public class PathResolver {
     }
   }
 
-  private static Result<Directory> findDirectory(Directory start, String path, boolean isAbsolutePath) {
-    String targetPath = isAbsolutePath ? path :start.getPath().equals("/") ? "/" + path : start.getPath() + "/" + path;
+  private static Result<Directory> findDirectory(
+      Directory start, String path, boolean isAbsolutePath) {
+    String targetPath =
+        isAbsolutePath ? path : (start.path().equals("/") ? "/" : start.path() + "/") + path;
 
-    if (start.getPath().equals(targetPath)) {
+    if (start.path().equals(targetPath)) {
       return new Result.Success<>(start, "");
     }
 
-    if (targetPath.startsWith(start.getPath())) {
-      for (FileSystemObjects child : start.getChildren()) {
+    if (targetPath.startsWith(start.path())) {
+      for (FileSystemObjects child : start.children()) {
         if (child.isDirectory()) {
-          Result<Directory> found = findDirectory( (Directory) child, targetPath, true);
+          Result<Directory> found = findDirectory((Directory) child, targetPath, true);
           if (found instanceof Result.Success) {
             return found;
           }

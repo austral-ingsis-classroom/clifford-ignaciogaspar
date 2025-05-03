@@ -8,6 +8,6 @@ public class MkdirFactory implements CommandFactory {
 
   @Override
   public Result<Command> create(String input) {
-    return new Result.Success<>(new Mkdir(input.trim()));
+    return new Result.Success<>(new Mkdir(input.trim()), "");
   }
 }
